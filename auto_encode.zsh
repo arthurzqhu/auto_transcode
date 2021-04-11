@@ -51,6 +51,8 @@ do_encode()
         new_size=$st_size
         if [ $new_size -lt $old_size && $dur_diff -lt 1 ]; then
             mv "$outfile" "$1"
+            # remove the temp dir
+            rm -rf "$curr_dir/.cvt_tmp/" 
         fi
 
         # record such incidence to deal with later
@@ -61,9 +63,6 @@ do_encode()
                 echo $1 >> "$curr_dir/auto_encode.log"
             fi
         fi
-
-        # remove the temp dir
-        rm -rf "$curr_dir/.cvt_tmp/" 
     fi
 }
 
