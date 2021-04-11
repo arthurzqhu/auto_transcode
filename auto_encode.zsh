@@ -11,30 +11,55 @@ check_video()
 }
 
 # output the codec
-check_codec()
+get_codec()
 {
     curr_codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name \
         -of default=noprint_wrappers=1:nokey=1 "$1")
 }
 
+# compare length - dont overwrite if they are not within a second
+cmp_dur()
+{
+    org_dur=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration \
+            -of default=noprint_wrappers=1:nokey=1 "$1")
+    new_dur=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration \
+            -of default=noprint_wrappers=1:nokey=1 "$2")
+    dur_diff=$((new_dur-org_dur))
+    dur_diff=${dur_diff#-} # take absolute value
+
+}
+
 # perform encoding process into hevc
 do_encode()
 {
-    check_codec "$1"
+    get_codec "$1"
+
     if [ "$curr_codec" = "hevc" ]; then
         echo "already hevc!"
     else
         f_name=$(basename "$1")
+        outfile="$curr_dir/.cvt_tmp/$f_name"
         mkdir "$curr_dir/.cvt_tmp/"
-        /Applications/HandBrakeCLI --preset-import-file fastOCTRA.json -Z "fastOCTRA" -i "$1" -o "$curr_dir/.cvt_tmp/$f_name"
+        /Applications/HandBrakeCLI --preset-import-file fastOCTRA.json -Z "fastOCTRA" -i "$1" -o $outfile
         
-        # compare the size ... only overwrite if it's smaller
+        cmp_dur "$1" "$outfile"
+        # compare the size and duration
+        # only overwrite the original file if size is smaller and duration is the same
         eval $(stat -s "$1")
         old_size=$st_size
-        eval $(stat -s "$curr_dir/.cvt_tmp/$f_name")
+        eval $(stat -s "$outfile")
         new_size=$st_size
-        if [ $new_size -lt $old_size ]; then
-            mv "$curr_dir/.cvt_tmp/$f_name" "$1"
+        if [ $new_size -lt $old_size && $dur_diff -lt 1 ]; then
+            mv "$outfile" "$1"
+        fi
+
+        # record such incidence to deal with later
+        if [ $dur_diff -gt 1 ]; then
+            if [ ! -f "$curr_dir/auto_encode.log" ]; then
+                echo $1 > "$curr_dir/auto_encode.log"
+            else
+                echo $1 >> "$curr_dir/auto_encode.log"
+            fi
         fi
 
         # remove the temp dir
@@ -55,6 +80,7 @@ list_allf()
         fi 
     done
 }
+
 
 trap "exit" INT
 
