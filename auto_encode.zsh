@@ -35,7 +35,7 @@ do_encode()
     get_codec "$1"
 
     if [ "$curr_codec" = "hevc" ]; then
-        echo "already hevc!"
+        echo "$1 already hevc!"
     else
         f_name=$(basename "$1")
         f_name=${f_name%.*}
