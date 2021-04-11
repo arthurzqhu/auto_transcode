@@ -56,7 +56,7 @@ do_encode()
         fi
 
         # record such incidence to deal with later
-        if [ $dur_diff -gt 1 ]; then
+        if [ $new_size -gt $old_size || $dur_diff -gt 1 ]; then
             if [ ! -f "$curr_dir/auto_encode.log" ]; then
                 echo $1 > "$curr_dir/auto_encode.log"
             else
