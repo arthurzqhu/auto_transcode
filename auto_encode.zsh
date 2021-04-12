@@ -103,6 +103,7 @@ if [[ -d "$input" ]]; then
     curr_dir="$input"
     # put all videos in the current directory into a list
     list_allf "$input"
+    echo total videos: ${#vid_list[@]}
     for v_file in "${vid_list[@]}"
     do
         do_encode "$v_file"
