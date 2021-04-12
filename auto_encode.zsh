@@ -65,6 +65,10 @@ do_encode()
                 echo $1 >> "$curr_dir/auto_encode.log"
             fi
         fi
+        
+        if [[ $new_size -gt $old_size ]]; then
+            rm -rf $outfile
+        fi
     fi
 }
 
