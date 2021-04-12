@@ -85,6 +85,7 @@ list_allf()
 
 trap "exit" INT
 
+echo give me a directory containing video files:
 read input
 
 
