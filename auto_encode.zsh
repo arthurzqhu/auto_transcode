@@ -39,6 +39,7 @@ do_encode()
         f_name=$(basename "$1")
         f_name=${f_name%.*}
         outfile="$curr_dir/.cvt_tmp/$f_name.mp4"
+        outdir=$(dirname "$1")
         mkdir "$curr_dir/.cvt_tmp/"
         /Applications/HandBrakeCLI --preset-import-file fastOCTRA.json -Z "fastOCTRA" -i "$1" -o $outfile
         
@@ -51,7 +52,7 @@ do_encode()
         new_size=$st_size
         if [[ $new_size -lt $old_size && $dur_diff -lt 1 ]]; then
             rm "$1"
-            mv "$outfile" "$curr_dir"
+            mv "$outfile" "$outdir/"
             # remove the temp dir
             rm -rf "$curr_dir/.cvt_tmp/" 
         fi
