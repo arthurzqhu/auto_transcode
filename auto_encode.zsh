@@ -113,5 +113,7 @@ if [[ -d "$input" ]]; then
     do
         do_encode "$v_file"
     done
+
+    echo "all done!"
 fi
 
