@@ -10,6 +10,25 @@ check_video()
     fi
 }
 
+# check if the video is already in the auto_encode or AE_comp
+get_skipped()
+{
+    skiplog="$curr_dir/auto_encode.log"
+    complog="$curr_dir/AE_comp.log"
+
+    if [ -f $skiplog ]; then 
+        while IFS= read -r line
+            do; skipped_files+=("$line")
+        done < "$skiplog"
+    fi 
+
+    if [ -f $complog ]; then
+        while IFS= read -r line
+            do; skipped_files+=("$line")
+        done < "$complog"
+    fi
+}
+
 # output the codec
 get_codec()
 {
@@ -35,12 +54,21 @@ do_encode()
 
     if [ "$curr_codec" = "hevc" ]; then
         echo "$1 already hevc!"
+
+        # record the file if it hasnt already been
+        if [ ! -f "$curr_dir/AE_comp.log" ]; then
+            echo $1 > "$curr_dir/AE_comp.log"
+        else
+            echo $1 >> "$curr_dir/AE_comp.log"
+        fi
     else
         f_name=$(basename "$1")
         f_name=${f_name%.*}
         outfile="$curr_dir/.cvt_tmp/$f_name.mp4"
         outdir=$(dirname "$1")
-        mkdir "$curr_dir/.cvt_tmp/"
+        if [ ! -d "$curr_dir/.cvt_tmp/" ]; then
+            mkdir "$curr_dir/.cvt_tmp/"
+        fi
         /Applications/HandBrakeCLI --preset-import-file fastOCTRA.json -Z "fastOCTRA" -i "$1" -o $outfile
         
         cmp_dur "$1" "$outfile"
@@ -55,6 +83,13 @@ do_encode()
             mv "$outfile" "$outdir/"
             # remove the temp dir
             rm -rf "$curr_dir/.cvt_tmp/" 
+
+            # record the completion of this file
+            if [ ! -f "$curr_dir/AE_comp.log" ]; then
+                echo $1 > "$curr_dir/AE_comp.log"
+            else
+                echo $1 >> "$curr_dir/AE_comp.log"
+            fi
         fi
 
         # record such incidence to deal with later
@@ -77,12 +112,16 @@ list_allf()
 {
 
     f_list=("${(@f)$(find $1 -type f)}")
+    get_skipped
     for item in "${f_list[@]}"
     do
         check_video $item
+        itemesc=("${item//\[/\\[}")
         if [[ "$l_vid" = true ]]; then
-            vid_list+=("$item")
-        fi 
+            if ! printf '%s\n' "${skipped_files[@]}" | grep -q -p -x "$itemesc"; then
+                vid_list+=("$item")
+            fi
+        fi
     done
 }
 
@@ -109,6 +148,9 @@ if [[ -d "$input" ]]; then
     # put all videos in the current directory into a list
     list_allf "$input"
     echo total videos: ${#vid_list[@]}
+    total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
+    echo total video size to re-encode: $total_size
+
     for v_file in "${vid_list[@]}"
     do
         do_encode "$v_file"
@@ -116,4 +158,3 @@ if [[ -d "$input" ]]; then
 
     echo "all done!"
 fi
-
