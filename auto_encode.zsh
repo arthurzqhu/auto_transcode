@@ -34,6 +34,9 @@ get_codec()
 {
     curr_codec=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_name \
         -of default=noprint_wrappers=1:nokey=1 "$1")
+
+    curr_codectag=$(ffprobe -v error -select_streams v:0 -show_entries stream=codec_tag_string \
+        -of default=noprint_wrappers=1:nokey=1 "$1")
 }
 
 # compare length - dont overwrite if they are not within a second
@@ -52,7 +55,7 @@ do_encode()
 {
     get_codec "$1"
 
-    if [ "$curr_codec" = "hevc" ]; then
+    if [[ "$curr_codec" == "hevc" && "$curr_codectag" == "hvc1" ]]; then
         echo "$1 already hevc!"
 
         # record the file if it hasnt already been
@@ -78,7 +81,7 @@ do_encode()
         old_size=$st_size
         eval $(stat -s "$outfile")
         new_size=$st_size
-        if [[ $new_size -lt $old_size && $dur_diff -lt 1 ]]; then
+        if [[ $curr_codectag == "hev1" || $new_size -lt $old_size && $dur_diff -lt 1 ]]; then
             rm "$1"
             mv "$outfile" "$outdir/"
             # remove the temp dir
@@ -128,7 +131,7 @@ list_allf()
 
 trap "exit" INT
 
-echo give me a directory containing video files:
+echo give me a video file or directory containing video files:
 read input
 
 
