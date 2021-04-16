@@ -3,7 +3,8 @@
 # check if the input is video
 check_video()
 {
-    if [[ "$1" == *.mkv || "$1" == *.mp4 || "$1" == *.avi ]]; then
+    if [[ "$1" == *.mkv || "$1" == *.mp4 || "$1" == *.avi || "$1" == *.wmv \
+            || "$1" == *.mov || "$1" == *.m4v ]]; then
         l_vid=true
     else
         l_vid=false
@@ -48,6 +49,23 @@ cmp_dur()
             -of default=noprint_wrappers=1:nokey=1 "$2")
     dur_diff=$((new_dur-org_dur))
     dur_diff=${dur_diff#-} # take absolute value
+}
+
+# put all videos in the current directory into a list
+list_allf()
+{
+    f_list=("${(@f)$(find $1 -type f)}")
+    get_skipped
+    for item in "${f_list[@]}"
+    do
+        check_video $item
+        itemesc=("${item//\[/\\[}") # need to escape the left bracket
+        if [[ "$l_vid" = true ]]; then
+            if ! printf '%s\n' "${skipped_files[@]}" | grep -q -p -x "$itemesc"; then
+                vid_list+=("$item")
+            fi
+        fi
+    done
 }
 
 # perform encoding process into hevc
@@ -108,24 +126,6 @@ do_encode()
             rm -rf $outfile
         fi
     fi
-}
-
-# put all videos in the current directory into a list
-list_allf()
-{
-
-    f_list=("${(@f)$(find $1 -type f)}")
-    get_skipped
-    for item in "${f_list[@]}"
-    do
-        check_video $item
-        itemesc=("${item//\[/\\[}")
-        if [[ "$l_vid" = true ]]; then
-            if ! printf '%s\n' "${skipped_files[@]}" | grep -q -p -x "$itemesc"; then
-                vid_list+=("$item")
-            fi
-        fi
-    done
 }
 
 
