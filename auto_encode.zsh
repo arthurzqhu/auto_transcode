@@ -131,25 +131,25 @@ list_allf()
 
 trap "exit" INT
 
-echo give me a video file or directory containing video files:
-read input
+# echo give me a video file or directory containing video files:
+# read input
 
 
-if [[ -f "$input" ]]; then
-    curr_dir="$(dirname "$input")"
+if [[ -f "$1" ]]; then
+    curr_dir="$(dirname "$1")"
     
-    check_video "$input"
+    check_video "$1"
     if [[ "$l_vid" = false ]]; then
         continue 
     else
-        do_encode "$input"
+        do_encode "$1"
     fi
 fi
 
-if [[ -d "$input" ]]; then
-    curr_dir="$input"
+if [[ -d "$1" ]]; then
+    curr_dir="$1"
     # put all videos in the current directory into a list
-    list_allf "$input"
+    list_allf "$1"
     echo total videos: ${#vid_list[@]}
     total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
     echo total video size to re-encode: $total_size
