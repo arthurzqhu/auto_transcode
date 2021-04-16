@@ -153,11 +153,12 @@ if [[ -d "$1" ]]; then
     echo total videos: ${#vid_list[@]}
     total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
     echo total video size to re-encode: $total_size
-
-    for v_file in "${vid_list[@]}"
-    do
-        do_encode "$v_file"
-    done
-
+    
+    if [[ ${#vid_list[@]} != 0 ]]; then
+        for v_file in "${vid_list[@]}"
+        do
+            do_encode "$v_file"
+        done
+    fi
     echo "all done!"
 fi
