@@ -104,7 +104,7 @@
       "VideoPreset" : "default",
       "VideoProfile" : "main",
       "VideoQSVDecode" : false,
-      "VideoQualitySlider" : 40,
+      "VideoQualitySlider" : 45,
       "VideoQualityType" : 2,
       "VideoScaler" : "swscale",
       "VideoTune" : "",
