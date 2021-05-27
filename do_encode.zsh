@@ -9,10 +9,10 @@ do_encode()
         echo "$1 already hevc!"
 
         # record the file if it hasnt already been
-        if [ ! -f "$curr_dir/AE_comp.log" ]; then
-            echo $1 > "$curr_dir/AE_comp.log"
+        if [ ! -f "$curr_dir/.AE_comp.log" ]; then
+            echo $1 > "$curr_dir/.AE_comp.log"
         else
-            echo $1 >> "$curr_dir/AE_comp.log"
+            echo $1 >> "$curr_dir/.AE_comp.log"
         fi
     else
         f_name=$(basename "$1")
@@ -38,19 +38,19 @@ do_encode()
             rm -rf "$curr_dir/.cvt_tmp/" 
 
             # record the completion of this file
-            if [ ! -f "$curr_dir/AE_comp.log" ]; then
-                echo $1 > "$curr_dir/AE_comp.log"
+            if [ ! -f "$curr_dir/.AE_comp.log" ]; then
+                echo $1 > "$curr_dir/.AE_comp.log"
             else
-                echo $1 >> "$curr_dir/AE_comp.log"
+                echo $1 >> "$curr_dir/.AE_comp.log"
             fi
         fi
 
         # record such incidence to deal with later
         if [[ $new_size -gt $old_size || $dur_diff -gt 1 ]]; then
-            if [ ! -f "$curr_dir/auto_encode.log" ]; then
-                echo $1 > "$curr_dir/auto_encode.log"
+            if [ ! -f "$curr_dir/.auto_encode.log" ]; then
+                echo $1 > "$curr_dir/.auto_encode.log"
             else
-                echo $1 >> "$curr_dir/auto_encode.log"
+                echo $1 >> "$curr_dir/.auto_encode.log"
             fi
         fi
         
