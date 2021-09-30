@@ -8,7 +8,6 @@ list_allf()
    for item in "${f_list[@]}" 
    do 
       check_video $item 
-      echo $2
       if [[ "$item:u" != *"$2:u"* ]]; then
          l_vid=false
       fi
