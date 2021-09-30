@@ -23,7 +23,7 @@ fi
 if [[ -d "$1" ]]; then
     curr_dir="$1"
     # put all videos in the current directory into a list
-    list_allf "$1"
+    list_allf $1 $2
     echo total videos: ${#vid_list[@]}
     total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
     echo total video size to re-encode: $total_size
