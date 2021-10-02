@@ -3,7 +3,7 @@
 # put all videos in the current directory into a list 
 list_allf() 
 { 
-   f_list=("${(@f)$(find $1 -type f)}") 
+   f_list=("${(@f)$(find $1 -type f | sort -f)}") 
    get_skipped 
    for item in "${f_list[@]}" 
    do 
