@@ -5,7 +5,7 @@ do_encode()
 {
     get_codec "$1"
 
-    if [[ "$curr_codec" == "hevc" && "$curr_codectag" == "hvc1" ]]; then
+    if [[ ! $l_force && "$curr_codec" == "hevc" && "$curr_codectag" == "hvc1" ]]; then
         echo "$1 already hevc!"
 
         # record the file if it hasnt already been

@@ -1,29 +1,63 @@
 #!/bin/zsh
 
+Help()
+{
+   # Help
+   echo "transcode non-HEVC video files to HEVC"
+   echo "auto_transcode [-f] dir/filename [filename substring (if the arg1 is dir)]"
+   echo
+   echo "options:"
+   echo "h   print this help"
+   echo "f   force transcode (even if it's already HEVC, or in the completed list)"
+}
+
+# get the options
+while getopts ":hf:" option; do
+   case $option in
+      h)
+         Help
+         exit;;
+      f) 
+         l_force=true
+         args=("$OPTARG")
+         until [[ $(eval "echo \${$OPTIND}") =~ ^-.* ]] || [ -z $(eval "echo \${$OPTIND}") ]; do
+             args+=($(eval "echo \${$OPTIND}"))
+             OPTIND=$((OPTIND + 1))
+         done
+   esac
+done
+
 . ./cmp_dur.zsh
 . ./do_encode.zsh
 . ./get_codec.zsh
 . ./list_allf.zsh
 . ./check_video.zsh
-. ./get_skipped.zsh
+if [[ ! $l_force ]]; then
+   . ./get_skipped.zsh
+   arg1=$1
+   arg2=$2
+else
+   arg1=$args[1]
+   arg2=$args[2]
+fi
 
 trap "exit" INT
 
-if [[ -f "$1" ]]; then
-    curr_dir="$(dirname "$1")"
+if [[ -f "$arg1" ]]; then
+    curr_dir="$(dirname "$arg1")"
     
-    check_video "$1"
+    check_video "$arg1"
     if [[ "$l_vid" = false ]]; then
         continue 
     else
-        do_encode "$1"
+        do_encode "$arg1"
     fi
 fi
 
-if [[ -d "$1" ]]; then
-    curr_dir="$1"
+if [[ -d "$arg1" ]]; then
+    curr_dir="$arg1"
     # put all videos in the current directory into a list
-    list_allf $1 $2
+    list_allf $arg1 $arg2
     echo total videos: ${#vid_list[@]}
     total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
     echo total video size to re-encode: $total_size
