@@ -22,7 +22,7 @@ do_encode()
         if [ ! -d "$curr_dir/.cvt_tmp/" ]; then
             mkdir "$curr_dir/.cvt_tmp/"
         fi
-        /Applications/HandBrakeCLI --preset-import-file fastOCTRA.json -Z "fastOCTRA" -i "$1" -o $outfile
+        /Applications/HandBrakeCLI --preset-import-file $pwdir/fastOCTRA.json -Z "fastOCTRA" -i "$1" -o $outfile
         
         cmp_dur "$1" "$outfile"
         # compare the size and duration

@@ -27,13 +27,20 @@ while getopts ":hf:" option; do
    esac
 done
 
-. ./cmp_dur.zsh
-. ./do_encode.zsh
-. ./get_codec.zsh
-. ./list_allf.zsh
-. ./check_video.zsh
+pwdir=$(dirname $0)
+
+if [[ $# -eq 0 ]]; then
+   echo "must pass in at least one argument. see help (-h) for more info."
+   exit
+fi
+
+. cmp_dur.zsh
+. do_encode.zsh
+. get_codec.zsh
+. list_allf.zsh
+. check_video.zsh
 if [[ ! $l_force ]]; then
-   . ./get_skipped.zsh
+   . get_skipped.zsh
    arg1=$1
    arg2=$2
 else
