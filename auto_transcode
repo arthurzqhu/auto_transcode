@@ -21,8 +21,8 @@ while getopts ":hf:" option; do
          l_force=true
          args=("$OPTARG")
          until [[ $(eval "echo \${$OPTIND}") =~ ^-.* ]] || [ -z $(eval "echo \${$OPTIND}") ]; do
-             args+=($(eval "echo \${$OPTIND}"))
-             OPTIND=$((OPTIND + 1))
+            args+=($(eval "echo \${$OPTIND}"))
+            OPTIND=$((OPTIND + 1))
          done
    esac
 done
@@ -51,29 +51,29 @@ fi
 trap "exit" INT
 
 if [[ -f "$arg1" ]]; then
-    curr_dir="$(dirname "$arg1")"
-    
-    check_video "$arg1"
-    if [[ "$l_vid" = false ]]; then
-        continue 
-    else
-        do_encode "$arg1"
-    fi
+   curr_dir="$(dirname "$arg1")"
+
+   check_video "$arg1"
+   if [[ "$l_vid" = false ]]; then
+      continue 
+   else
+      do_encode "$arg1"
+   fi
 fi
 
 if [[ -d "$arg1" ]]; then
-    curr_dir="$arg1"
-    # put all videos in the current directory into a list
-    list_allf $arg1 $arg2
-    echo total videos: ${#vid_list[@]}
-    total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
-    echo total video size to re-encode: $total_size
-    
-    if [[ ${#vid_list[@]} != 0 ]]; then
-        for v_file in "${vid_list[@]}"
-        do
-            do_encode "$v_file"
-        done
-    fi
-    echo "all done!"
+   curr_dir="$arg1"
+   # put all videos in the current directory into a list
+   list_allf $arg1 $arg2
+   echo total videos: ${#vid_list[@]}
+   total_size=$(du -ch $vid_list | tail -1 | cut -f 1)
+   echo total video size to re-encode: $total_size
+
+   if [[ ${#vid_list[@]} != 0 ]]; then
+      for v_file in "${vid_list[@]}"
+      do
+         do_encode "$v_file"
+      done
+   fi
+   echo "all done!"
 fi
