@@ -4,6 +4,7 @@
 do_encode()
 {
    get_codec "$1"
+   orig_time=$(date -r "$1" +%Y%m%d%H%M)
 
    if [[ ! $l_force && "$curr_codec" == "hevc" && "$curr_codectag" == "hvc1" ]]; then
       echo "$1 already hevc!"
@@ -33,6 +34,7 @@ do_encode()
       new_size=$st_size
       if [[ $curr_codectag == "hev1" || $new_size -lt $old_size && $dur_diff -lt 1 ]]; then
          rm "$1"
+         touch -amt $orig_time "$outfile"
          mv "$outfile" "$outdir/"
          # remove the temp dir
          rm -rf "$curr_dir/.cvt_tmp/" 
